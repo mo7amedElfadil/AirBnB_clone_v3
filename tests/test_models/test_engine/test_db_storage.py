@@ -18,6 +18,7 @@ import json
 import os
 import pep8
 import unittest
+import MySQLdb
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -68,8 +69,37 @@ test_db_storage.py'])
                             "{:s} method needs a docstring".format(func[0]))
 
 
+def create_cursor():
+    """Create a cursor"""
+    conn = MySQLdb.connect(host=os.getenv('HBNB_MYSQL_HOST'),
+                           port=3306,
+                           user=os.getenv('HBNB_MYSQL_USER'),
+                           passwd=os.getenv('HBNB_MYSQL_PWD'),
+                           db=os.getenv('HBNB_MYSQL_DB'))
+    return conn.cursor()
+
+
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
+    def setUp(self):
+        self.storage = models.storage
+        self.instances = {}
+        self.instances['State'] = State(name="California")
+
+        for instance in self.instances.values():
+            instance.save()
+        self.storage.save()
+        self.cursor = create_cursor()
+
+    def tearDown(self):
+        """Tear down the tests"""
+        ignore = ['City', 'Review', 'Place']
+        for k, instance in self.instances.items():
+            if k not in ignore:
+                instance.delete()
+        self.storage.save()
+        self.cursor.close()
+
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_returns_dict(self):
         """Test that all returns a dictionaty"""
@@ -86,3 +116,19 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """Test the get method"""
+        state = self.storage.get(State, self.instances['State'].id)
+        self.assertEqual(state, self.instances['State'])
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Test the count method"""
+        count = self.storage.count(State)
+        self.assertEqual(count, len([state for state in
+                                     self.instances.values()
+                                     if isinstance(state, State)]))
+        count = self.storage.count()
+        self.assertEqual(count, len(self.instances))
