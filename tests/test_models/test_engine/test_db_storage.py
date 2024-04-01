@@ -127,8 +127,6 @@ class TestFileStorage(unittest.TestCase):
     def test_count(self):
         """Test the count method"""
         count = self.storage.count(State)
-        self.assertEqual(count, len([state for state in
-                                     self.instances.values()
-                                     if isinstance(state, State)]))
+        self.assertEqual(count, len(self.storage.all(State)))
         count = self.storage.count()
-        self.assertEqual(count, len(self.instances))
+        self.assertEqual(count, len(self.storage.all()))
