@@ -25,7 +25,7 @@ def get_amenity(amenity_id):
     """Returns an instance of amenity"""
     result = storage.get(Amenity, amenity_id)
     error_404(result)
-    return jsonify(result.to_dict())
+    return jsonify(result.to_dict()), 200
 
 
 @app_views.route("/amenities/<amenity_id>", strict_slashes=False,
