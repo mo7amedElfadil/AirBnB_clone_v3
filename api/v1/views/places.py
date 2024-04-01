@@ -14,7 +14,7 @@ from models import storage
 from models.city import City
 from models.place import Place
 from models.state import State
-from models.amenity import Amenity
+from models.user import User
 
 
 def error_404(result):
@@ -85,6 +85,9 @@ def post_place(city_id):
         abort(400, "Not a JSON")
     if not args.get("user_id"):
         abort(400, description="Missing user_id")
+    user = storage.get(User, args["user_id"])
+    if not user:
+        abort(404)
     if not args.get("name"):
         abort(400, description="Missing name")
     args["city_id"] = city_id
