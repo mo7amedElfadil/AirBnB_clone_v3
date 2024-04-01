@@ -50,7 +50,7 @@ function get_3_places {
 	for i in $CITY_ID
 	do
 		echo $i;
-		PLACES=$(curl -sLX GET $HOST/cities/$i/places/)
+		PLACES=$(curl -sX GET $HOST/cities/$i/places/)
 		#print all places ids
 		# print places id
 		PLACES_IDS=$(echo $PLACES |grep -o '"id":"[^"]*' | cut -d'"' -f4);
@@ -97,6 +97,7 @@ function states {
 	echo -e "\n"
 
 	STATE_ID=$(echo "$STATES" | grep -o '"id":"[^"]*' |  head -n1 | cut -d'"' -f4)
+	echo -e "STATEIDS: \n$STATE_ID\n\n"
 	echo -e "${GRN}GET /api/v1/states/${STATE_ID}${WHT}"
 	STATE=$(curl -sX GET $HOST/states/"${STATE_ID}")
 	echo -e "${YLW}${STATE}${WHT}"
@@ -309,7 +310,6 @@ function user {
 run;
 case $1 in
 	"info")
-	
 	info;
 	;;
 	"5")

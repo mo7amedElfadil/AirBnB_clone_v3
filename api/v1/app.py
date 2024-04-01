@@ -27,6 +27,12 @@ def not_found(_):
     return {"error": "Not found"}, 404
 
 
+@app.errorhandler(400)
+def bad_request(_):
+    """Return 400 error"""
+    return _.description, 400
+
+
 if __name__ == "__main__":
     app.run(host=getenv("HBNB_API_HOST", "0.0.0.0"),
             port=int(getenv("HBNB_API_PORT", 5000)),

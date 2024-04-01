@@ -81,7 +81,7 @@ class DBStorage:
     def get(self, cls, id):
         """Returns the object based on the class and ID
         """
-        if cls.__name__ not in classes:
+        if cls.__name__ not in classes or id is None:
             return None
         class_objects = self.all(cls)
         id_ = "{}.{}".format(cls.__name__, id)
