@@ -87,8 +87,7 @@ class DBStorage:
         id_ = f"{cls.__name__}.{id}"
         if id_ in class_objects:
             return class_objects[id_]
-        else:
-            return None
+        return None
 
     def count(self, cls=None):
         """Returns the number of objects in a class.
@@ -96,5 +95,4 @@ class DBStorage:
         """
         if cls is None:
             return len(self.all())
-        else:
-            return len(self.all(cls))
+        return len(self.all(cls))
