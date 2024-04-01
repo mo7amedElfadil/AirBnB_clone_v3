@@ -16,3 +16,4 @@ test_paarams_create
 test_db_create.sql
 t1.py
 run_server.sh
+tests.bak

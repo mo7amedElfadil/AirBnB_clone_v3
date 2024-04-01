@@ -47,9 +47,10 @@ def put_place(place_id):
     """Updates an instance of the place entities"""
     result = storage.get(Place, place_id)
     error_404(result)
+    if request.is_json is False or request.content_type != "application/json":
+        abort(400, "Not a JSON")
+
     args = request.get_json(silent=True)
-    if not args:
-        abort(400, description="Not a JSON")
     for k, v in args.items():
         if k not in ["id", "user_id", "city_id",
                      "created_at", "updated_at"]:
@@ -73,9 +74,9 @@ def post_place(city_id):
     """Adds a new instance of Place into the dataset"""
     result = storage.get(City, city_id)
     error_404(result)
+    if request.is_json is False or request.content_type != "application/json":
+        abort(400, "Not a JSON")
     args = request.get_json(silent=True)
-    if not args:
-        abort(400, description="Not a JSON")
     if not args.get("user_id"):
         abort(400, description="Missing user_id")
     if not args.get("name"):

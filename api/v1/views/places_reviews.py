@@ -57,9 +57,9 @@ def post_new_review(place_id):
     """Adds a new instance of Review into the dataset"""
     result = storage.get(Place, place_id)
     error_404(result)
-    args = request.get_json(silent=True)
-    if not args:
+    if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
     if not args.get("user_id"):
         abort(400, "Missing user_id")
     if not storage.get(User, args["user_id"]):
@@ -77,9 +77,9 @@ def put_review(review_id):
     """Updates an instance of the review entities"""
     result = storage.get(Review, review_id)
     error_404(result)
-    args = request.get_json(silent=True)
-    if not args:
+    if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
     for k, v in args.items():
         if k not in ["id", "created_at", "updated_at"]:
             setattr(result, k, v)

@@ -46,9 +46,9 @@ def put_user(user_id):
     """Updates an instance of the user entities"""
     result = storage.get(User, user_id)
     error_404(result)
-    args = request.get_json(silent=True)
-    if not args:
+    if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
     for k, v in args.items():
         if k not in ["id", "email", "created_at", "updated_at"]:
             setattr(result, k, v)
@@ -68,9 +68,9 @@ def get_users():
                  methods=["POST"])
 def post_new_user():
     """Adds a new instance of User into the dataset"""
-    args = request.get_json(silent=True)
-    if not args:
+    if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
     if not args.get("email"):
         abort(400, "Missing email")
     if not args.get("password"):
