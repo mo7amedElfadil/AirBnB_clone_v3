@@ -16,7 +16,7 @@ HOST="http://0.0.0.0:$PORT/api/v1"
 
 function run {
 	echo "${BLU}---------------------Running server-----------------------${WHT}"
-	HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=d HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=$PORT python3 -m api.v1.app > /dev/null 2>&1 &
+	HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=$PORT python3 -m api.v1.app > /dev/null 2>&1 &
 	echo $! > api.pid
 	sleep 2;
 }
@@ -29,6 +29,42 @@ function cleanup {
 }
 
 # Run the tests
+
+function create_5_states {
+
+	for i in {1..5}
+	do
+		curl -sX POST $HOST/states/ -H "Content-Type: application/json" -d '{"name": "State '$i'"}' -vvv > /dev/null 2>&1
+	done
+}
+# get first state then find first 3 cities in that state and find find first 3 places in that city
+function get_3_places {
+	STATES=$(curl -sX GET $HOST/states/)
+	STATE_ID=$(echo "$STATES" | grep -o '"id":"[^"]*' |  head -n5 | tail -1| cut -d'"' -f4)
+	echo "State ID"
+	echo $STATE_ID;
+	CITIES=$(curl -sX GET $HOST/states/$STATE_ID/cities/)
+	CITY_ID=$(echo "$CITIES" | grep -o '"id":"[^"]*' |  head -n3 | cut -d'"' -f4)
+	echo "City ID"
+	echo $CITY_ID;
+	for i in $CITY_ID
+	do
+		echo $i;
+		PLACES=$(curl -sLX GET $HOST/cities/$i/places/)
+		#print all places ids
+		# print places id
+		PLACES_IDS=$(echo $PLACES |grep -o '"id":"[^"]*' | cut -d'"' -f4);
+		echo "Place ID"
+		for j in $PLACES_IDS
+		do
+			echo $j;
+			AMENITY=$(curl -sX GET $HOST/places/$j/amenities/)
+			echo "Amenities ID"
+			echo $AMENITIES | grep -o '"id":"[^"]*' | cut -d'"' -f4;
+		done
+		# get amenities from places
+	done
+}
 
 function info {
 
@@ -275,6 +311,12 @@ case $1 in
 	"info")
 	
 	info;
+	;;
+	"5")
+	create_5_states;
+	;;
+	"3")
+	get_3_places;
 	;;
 	"states")
 	states;

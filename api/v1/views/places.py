@@ -13,6 +13,8 @@ from flask import abort, jsonify, request
 from models import storage
 from models.city import City
 from models.place import Place
+from models.state import State
+from models.amenity import Amenity
 
 
 def error_404(result):
@@ -89,3 +91,57 @@ def post_place(city_id):
     new_place = Place(**args)
     new_place.save()
     return jsonify(new_place.to_dict()), 201
+
+
+@app_views.route("/places_search", strict_slashes=False,
+                 methods=["POST"])
+def places_search():
+    """
+    retrieves all Place objects depending on the
+    JSON in the body of the request.
+    """
+    if request.is_json is False or request.content_type != "application/json":
+        abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
+    return jsonify(filter_places(**args)), 200
+
+
+def filter_places(**kwargs):
+    """ Filter place ids """
+    keys = {"states": State, "cities": City}
+    places_set = set()
+    filtered_set = set()
+
+    for k, v in keys.items():
+        if k in kwargs:
+            if kwargs[k]:
+                if k == "states":
+                    for k_id in kwargs[k]:
+                        state = storage.get(v, k_id)
+                        if not state:
+                            continue
+                        places_set.update([place for city in state.cities
+                                           for place in city.places])
+                if k == "cities":
+                    for k_id in kwargs[k]:
+                        city = storage.get(v, k_id)
+                        if not city:
+                            continue
+                        places_set.update([place for place in city.places])
+        if not places_set:
+            places_set.update([place for place in storage.all(Place)])
+
+    if "amenities" in kwargs:
+        for place in places_set:
+            am_ids = [amenity.id for amenity in place.amenities]
+            if all(kw_id in am_ids for kw_id in kwargs["amenities"]):
+                filtered_set.add(place)
+        filtered_list = [place.to_dict() for place in filtered_set]
+        for place in filtered_list:
+            del place["amenities"]
+
+        return filtered_list
+
+    return [place.to_dict() for place in places_set]
