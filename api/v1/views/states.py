@@ -23,7 +23,8 @@ def error_404(result):
                  methods=["GET"])
 def get_states():
     """Returns a list of states"""
-    return jsonify([value.to_dict() for value in storage.all(State).values()])
+    return jsonify([value.to_dict() for value
+                    in storage.all(State).values()]), 200
 
 
 @app_views.route("/states", strict_slashes=False,
@@ -33,6 +34,8 @@ def post_states():
     if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
     args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
     if not args.get("name"):
         abort(400, "Missing name")
     new_state = State(**args)
@@ -46,7 +49,7 @@ def get_state(state_id):
     """Returns a state with the specific id"""
     result = storage.get(State, state_id)
     error_404(result)
-    return jsonify(result.to_dict())
+    return jsonify(result.to_dict()), 200
 
 
 @app_views.route("/states/<state_id>", strict_slashes=False,
@@ -69,6 +72,8 @@ def put_state(state_id):
     if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
     args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
     for k, v in args.items():
         if k not in ["id", "created_at", "updated_at"]:
             setattr(result, k, v)
