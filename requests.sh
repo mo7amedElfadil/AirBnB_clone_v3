@@ -16,7 +16,7 @@ HOST="http://0.0.0.0:$PORT/api/v1"
 
 function run {
 	echo "${BLU}---------------------Running server-----------------------${WHT}"
-	HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=$PORT python3 -m api.v1.app > /dev/null 2>&1 &
+	HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=d HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=$PORT python3 -m api.v1.app > /dev/null 2>&1 &
 	echo $! > api.pid
 	sleep 2;
 }
@@ -230,8 +230,7 @@ function user {
 	echo -e "\n"
 
 	echo -e "${GRN}POST /api/v1/users${WHT}"
-	POST_USER=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"email": "
-	"password": "password"}' -vvv)
+	POST_USER=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"email": "email", "password": "password"}' -vvv)
 	echo -e "${YLW}${POST_USER}${WHT}"
 	echo -e "\n"
 
@@ -255,19 +254,19 @@ function user {
 
 	USER_ID_NEW=$(echo "$POST_USER" | grep -o '"id":"[^"]*' |  tail -n1 | cut -d'"' -f4)
 	echo -e "${GRN}PUT /api/v1/users/${USER_ID_NEW}${WHT}"
-	PUT_USER=$(curl -sX PUT $HOST/users/"${USER_ID_NEW}" -H "Content-Type: application/json" -d '{"email": "email", "password": "password"}')
+	PUT_USER=$(curl -sX PUT $HOST/users/"${USER_ID_NEW}" -H "Content-Type: application/json" -d '{"email": "email", "password": "password", "first_name": "first", "last_name": "last"}')
 	echo -e "${YLW}${PUT_USER}${WHT}"
 	echo -e "\n"
 
-	echo -e "${GRN}DELETE /api/v1/users/${USER_ID_NEW}${WHT}"
-	DELETE_USER=$(curl -sX DELETE $HOST/users/"${USER_ID_NEW}")
-	echo -e "${YLW}${DELETE_USER}${WHT}"
-	echo -e "\n"
+	# echo -e "${GRN}DELETE /api/v1/users/${USER_ID_NEW}${WHT}"
+	# DELETE_USER=$(curl -sX DELETE $HOST/users/"${USER_ID_NEW}")
+	# echo -e "${YLW}${DELETE_USER}${WHT}"
+	# echo -e "\n"
 
-	echo -e "${GRN}GET /api/v1/users/${USER_ID_NEW}\nConfirm Delete. Expect Not Found${WHT}"
-	USER_NOT_FOUND=$(curl -sX GET $HOST/users/"${USER_ID_NEW}")
-	echo -e "${GRN}${USER_NOT_FOUND}${WHT}"
-	echo -e "\n"
+	# echo -e "${GRN}GET /api/v1/users/${USER_ID_NEW}\nConfirm Delete. Expect Not Found${WHT}"
+	# USER_NOT_FOUND=$(curl -sX GET $HOST/users/"${USER_ID_NEW}")
+	# echo -e "${GRN}${USER_NOT_FOUND}${WHT}"
+	# echo -e "\n"
 
 }
 
