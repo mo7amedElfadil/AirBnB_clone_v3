@@ -60,6 +60,8 @@ def post_new_review(place_id):
     if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
     args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
     if not args.get("user_id"):
         abort(400, "Missing user_id")
     if not storage.get(User, args["user_id"]):
@@ -80,6 +82,8 @@ def put_review(review_id):
     if request.is_json is False or request.content_type != "application/json":
         abort(400, "Not a JSON")
     args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
     for k, v in args.items():
         if k not in ["id", "created_at", "updated_at"]:
             setattr(result, k, v)
