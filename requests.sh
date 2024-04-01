@@ -214,7 +214,62 @@ function amenities {
 
 }
 
+function user {
+	echo -e "${BLU}________________________________________________________${WHT}"
+	echo -e "${BLU}_____________________USERS____________________________${WHT}"
 
+	echo -e "${GRN}GET /api/v1/users${WHT}"
+	USERS=$(curl -sX GET $HOST/users/)
+	echo -e "${YLW}${USERS}${WHT}"
+	echo -e "\n"
+	
+	USER_ID=$(echo "$USERS" | grep -o '"id":"[^"]*' |  head -n1 | cut -d'"' -f4)
+	echo -e "${GRN}GET /api/v1/users/${USER_ID}${WHT}"
+	USER=$(curl -sX GET $HOST/users/"${USER_ID}")
+	echo -e "${YLW}${USER}${WHT}"
+	echo -e "\n"
+
+	echo -e "${GRN}POST /api/v1/users${WHT}"
+	POST_USER=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"email": "
+	"password": "password"}' -vvv)
+	echo -e "${YLW}${POST_USER}${WHT}"
+	echo -e "\n"
+
+	# missing email
+	echo -e "${GRN}POST /api/v1/users\nMissingEmail${WHT}"
+	POST_USER_NOT_EMAIL=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"password": "password"}' -vvv)
+	echo -e "${RED}${POST_USER_NOT_EMAIL}${WHT}"
+	echo -e "\n"
+
+	# missing password
+	echo -e "${GRN}POST /api/v1/users\nMissingPassword${WHT}"
+	POST_USER_NOT_PASSWORD=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"email": "email"}' -vvv)
+	echo -e "${RED}${POST_USER_NOT_PASSWORD}${WHT}"
+	echo -e "\n"
+	
+	# not a json
+	echo -e "${GRN}POST /api/v1/users\nNotAValidJSON${WHT}"
+	POST_USER_NOT_JSON=$(curl -sX POST $HOST/users/ -H "Content-Type: application/json" -d '{"email"}' -vvv)
+	echo -e "${RED}${POST_USER_NOT_JSON}${WHT}"
+	echo -e "\n"
+
+	USER_ID_NEW=$(echo "$POST_USER" | grep -o '"id":"[^"]*' |  tail -n1 | cut -d'"' -f4)
+	echo -e "${GRN}PUT /api/v1/users/${USER_ID_NEW}${WHT}"
+	PUT_USER=$(curl -sX PUT $HOST/users/"${USER_ID_NEW}" -H "Content-Type: application/json" -d '{"email": "email", "password": "password"}')
+	echo -e "${YLW}${PUT_USER}${WHT}"
+	echo -e "\n"
+
+	echo -e "${GRN}DELETE /api/v1/users/${USER_ID_NEW}${WHT}"
+	DELETE_USER=$(curl -sX DELETE $HOST/users/"${USER_ID_NEW}")
+	echo -e "${YLW}${DELETE_USER}${WHT}"
+	echo -e "\n"
+
+	echo -e "${GRN}GET /api/v1/users/${USER_ID_NEW}\nConfirm Delete. Expect Not Found${WHT}"
+	USER_NOT_FOUND=$(curl -sX GET $HOST/users/"${USER_ID_NEW}")
+	echo -e "${GRN}${USER_NOT_FOUND}${WHT}"
+	echo -e "\n"
+
+}
 
 run;
 case $1 in
@@ -228,11 +283,11 @@ case $1 in
 	"cities")
 	cities;
 	;;
-	"cleanup")
-	cleanup;
-	;;
 	"amenities")
 	amenities;
+	;;
+	"user")
+	user;
 	;;
 	*)
 	info;
