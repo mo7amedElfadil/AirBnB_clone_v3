@@ -28,7 +28,7 @@ def get_reviews(place_id):
     """Returns a list of reviews for a certain place"""
     result = storage.get(Place, place_id)
     error_404(result)
-    return jsonify([value.to_dict() for value in result.reviews])
+    return jsonify([value.to_dict() for value in result.reviews]), 200
 
 
 @app_views.route("/reviews/<review_id>", strict_slashes=False,
@@ -37,7 +37,7 @@ def get_review(review_id):
     """Returns a review with the specific state id"""
     result = storage.get(Review, review_id)
     error_404(result)
-    return jsonify(result.to_dict())
+    return jsonify(result.to_dict()), 200
 
 
 @app_views.route("/reviews/<review_id>", strict_slashes=False,

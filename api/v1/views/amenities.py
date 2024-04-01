@@ -63,7 +63,7 @@ def get_all_amenities():
     """Returns a list of all amenities"""
     result = storage.all(Amenity)
     error_404(result)
-    return jsonify([value.to_dict() for value in result.values()])
+    return jsonify([value.to_dict() for value in result.values()]), 200
 
 
 @app_views.route("/amenities", strict_slashes=False,

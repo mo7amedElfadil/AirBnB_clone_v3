@@ -27,7 +27,7 @@ def get_place(place_id):
     """Returns an instance of place"""
     result = storage.get(Place, place_id)
     error_404(result)
-    return jsonify(result.to_dict())
+    return jsonify(result.to_dict()), 200
 
 
 @app_views.route("/places/<place_id>", strict_slashes=False,
@@ -67,7 +67,7 @@ def get_places(city_id):
     """Returns a list of places with the specific city id"""
     result = storage.get(City, city_id)
     error_404(result)
-    return jsonify([value.to_dict() for value in result.places])
+    return jsonify([value.to_dict() for value in result.places]), 200
 
 
 @app_views.route("/cities/<city_id>/places", strict_slashes=False,
