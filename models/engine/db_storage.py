@@ -84,7 +84,7 @@ class DBStorage:
         if cls.__name__ not in classes:
             return None
         class_objects = self.all(cls)
-        id_ = f"{cls.__name__}.{id}"
+        id_ = "{}.{}".format(cls.__name__, id)
         if id_ in class_objects:
             return class_objects[id_]
         return None

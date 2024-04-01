@@ -8,13 +8,21 @@ BLU='\e[0;34m'
 
 # Run the server
 # run;
+PORT=5000
+HOST="http://0.0.0.0:$PORT/api/v1"
+
+
+
 
 function run {
+	echo "${BLU}---------------------Running server-----------------------${WHT}"
 	HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db HBNB_API_HOST=0.0.0.0 HBNB_API_PORT=$PORT python3 -m api.v1.app > /dev/null 2>&1 &
 	echo $! > api.pid
+	sleep 2;
 }
 
 function cleanup {
+	echo "${BLU}---------------------Killing Server-----------------------${WHT}"
 	kill -9 `cat api.pid` > /dev/null 2>&1;
 	rm api.pid;
 	exit 0;
@@ -206,8 +214,7 @@ function amenities {
 
 }
 
-PORT=5000
-HOST="http://0.0.0.0:$PORT/api/v1"
+
 
 run;
 case $1 in
