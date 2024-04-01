@@ -28,7 +28,7 @@ def get_reviews(place_id):
     """Returns a list of reviews for a certain place"""
     result = storage.get(Place, place_id)
     error_404(result)
-    return jsonify([value.to_dict() for value in result.values()])
+    return jsonify([value.to_dict() for value in result.reviews])
 
 
 @app_views.route("/reviews/<review_id>", strict_slashes=False,
@@ -70,6 +70,7 @@ def post_new_review(place_id):
         abort(400, "Missing text")
     new_review = Review(**args)
     new_review.save()
+    result.reviews.append(new_review)
     return jsonify(new_review.to_dict()), 201
 
 
