@@ -120,15 +120,13 @@ def filter_places(**kwargs):
                 if k == "states":
                     for k_id in kwargs[k]:
                         state = storage.get(v, k_id)
-                        if not state:
-                            continue
+                        error_404(state)
                         places_set.update([place for city in state.cities
                                            for place in city.places])
                 if k == "cities":
                     for k_id in kwargs[k]:
                         city = storage.get(v, k_id)
-                        if not city:
-                            continue
+                        error_404(city)
                         places_set.update([place for place in city.places])
         if not places_set:
             places_set.update([place for place in storage.all(Place)])
