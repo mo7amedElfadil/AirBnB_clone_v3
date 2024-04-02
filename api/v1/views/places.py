@@ -7,8 +7,6 @@ the default RESTful API actions
     /api/v1/citys/<city_id>/places [GET, POST]
 
 """
-
-from flask.scaffold import F
 from api.v1.views import app_views
 from flask import abort, jsonify, request
 from models import storage
