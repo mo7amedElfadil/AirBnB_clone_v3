@@ -122,7 +122,8 @@ def filter_places(**kwargs):
             if not state:
                 continue
             city_ids.update([city.id for city in state.cities])
-
+    if not city_ids:
+        return exclude_places(storage.all(Place).values(), **kwargs)
     return exclude_places(retrieve_places(city_ids), **kwargs)
 
 
