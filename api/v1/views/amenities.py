@@ -19,6 +19,15 @@ def error_404(result):
         abort(404)
 
 
+@app_views.route("/amenities", strict_slashes=False,
+                 methods=["GET"])
+def get_all_amenities():
+    """Returns a list of all amenities"""
+    result = storage.all(Amenity)
+    error_404(result)
+    return jsonify([value.to_dict() for value in result.values()]), 200
+
+
 @app_views.route("/amenities/<amenity_id>", strict_slashes=False,
                  methods=["GET"])
 def get_amenity(amenity_id):
@@ -39,6 +48,22 @@ def delete_amenity(amenity_id):
     return jsonify({}), 200
 
 
+@app_views.route("/amenities", strict_slashes=False,
+                 methods=["POST"])
+def post_new_amenity():
+    """Adds a new instance of Amenity into the dataset"""
+    if request.is_json is False or request.content_type != "application/json":
+        abort(400, "Not a JSON")
+    args = request.get_json(silent=True)
+    if not args:
+        abort(400, "Not a JSON")
+    if not args.get("name"):
+        abort(400, "Missing name")
+    new_amenity = Amenity(**args)
+    new_amenity.save()
+    return jsonify(new_amenity.to_dict()), 201
+
+
 @app_views.route("/amenities/<amenity_id>", strict_slashes=False,
                  methods=["PUT"])
 def put_amenity(amenity_id):
@@ -55,28 +80,3 @@ def put_amenity(amenity_id):
             setattr(result, k, v)
     result.save()
     return jsonify(result.to_dict()), 200
-
-
-@app_views.route("/amenities", strict_slashes=False,
-                 methods=["GET"])
-def get_all_amenities():
-    """Returns a list of all amenities"""
-    result = storage.all(Amenity)
-    error_404(result)
-    return jsonify([value.to_dict() for value in result.values()]), 200
-
-
-@app_views.route("/amenities", strict_slashes=False,
-                 methods=["POST"])
-def post_new_amenity():
-    """Adds a new instance of Amenity into the dataset"""
-    if request.is_json is False or request.content_type != "application/json":
-        abort(400, "Not a JSON")
-    args = request.get_json(silent=True)
-    if not args:
-        abort(400, "Not a JSON")
-    if not args.get("name"):
-        abort(400, "Missing name")
-    new_amenity = Amenity(**args)
-    new_amenity.save()
-    return jsonify(new_amenity.to_dict()), 201

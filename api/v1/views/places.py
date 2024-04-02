@@ -8,6 +8,7 @@ the default RESTful API actions
 
 """
 
+from flask.scaffold import F
 from api.v1.views import app_views
 from flask import abort, jsonify, request
 from models import storage
@@ -113,9 +114,6 @@ def places_search():
 
 def filter_places(**kwargs):
     """ Filter place ids """
-    keys = {"states": State, "cities": City}
-    places_set = set()
-    filtered_set = set()
     city_ids = set()
 
     if "cities" in kwargs:
@@ -132,6 +130,7 @@ def filter_places(**kwargs):
 
 def exclude_places(places_set, **kwargs):
     """This function filters a list of places"""
+    filtered_set = set()
     if "amenities" in kwargs:
         for place in places_set:
             am_ids = [amenity.id for amenity in place.amenities]
@@ -151,6 +150,6 @@ def retrieve_places(city_list):
     places_set = set()
     places = storage.all(Place).values()
     for place in places:
-        if places.city_id in city_list:
+        if place.city_id in city_list:
             places_set.add(place)
     return places_set
