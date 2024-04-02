@@ -116,26 +116,22 @@ def filter_places(**kwargs):
     keys = {"states": State, "cities": City}
     places_set = set()
     filtered_set = set()
+    city_ids = set()
 
-    for k, v in keys.items():
-        if k in kwargs:
-            if kwargs[k]:
-                if k == "states":
-                    for k_id in kwargs[k]:
-                        state = storage.get(v, k_id)
-                        if not state:
-                            continue
-                        places_set.update([place for city in state.cities
-                                           for place in city.places])
-                if k == "cities":
-                    for k_id in kwargs[k]:
-                        city = storage.get(v, k_id)
-                        if not city:
-                            continue
-                        places_set.update([place for place in city.places])
-        if not places_set:
-            places_set.update([place for place in storage.all(Place)])
+    if "cities" in kwargs:
+        city_ids.update(kwargs["cities"])
+    if "states" in kwargs:
+        for k_id in kwargs["states"]:
+            state = storage.get(State, k_id)
+            if not state:
+                continue
+            city_ids.update([city.id for city in state.cities])
 
+    return exclude_places(retrieve_places(city_ids), **kwargs)
+
+
+def exclude_places(places_set, **kwargs):
+    """This function filters a list of places"""
     if "amenities" in kwargs:
         for place in places_set:
             am_ids = [amenity.id for amenity in place.amenities]
@@ -148,3 +144,13 @@ def filter_places(**kwargs):
         return filtered_list
 
     return [place.to_dict() for place in places_set]
+
+
+def retrieve_places(city_list):
+    """This function retrieves places"""
+    places_set = set()
+    places = storage.all(Place).values()
+    for place in places:
+        if places.city_id in city_list:
+            places_set.add(place)
+    return places_set
